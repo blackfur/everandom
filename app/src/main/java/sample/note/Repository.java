@@ -2,10 +2,12 @@ package sample.note;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import androidx.preference.PreferenceManager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -23,17 +25,26 @@ public class Repository extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "ID";
     public static final String COLUMN_TIMESTAMP = "TIMESTAMP";
     public static final String COLUMN_TXT = "TXT";
+    public static final String COLUMN_STATUS= "STATUS";
     Context ctx;
+    SharedPreferences opt;
 
     public Repository(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         ctx = context;
+        opt = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + TABLE_NAME + " ( " + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_TIMESTAMP + " VARCHAR, " + COLUMN_TXT + " VARCHAR);");
+        String sql = "create table " + TABLE_NAME + " ( "
+                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_STATUS + " INTEGER DEFAULT 0, "
+                + COLUMN_TIMESTAMP + " VARCHAR, "
+                + COLUMN_TXT + " VARCHAR"
+                + ");";
+        Log.i("repo.update", sql);
+        db.execSQL(sql);
     }
 
     @Override
@@ -61,6 +72,8 @@ public class Repository extends SQLiteOpenHelper {
         String timestamp = row.get(COLUMN_TIMESTAMP);
         contentValues.put(COLUMN_TIMESTAMP, timestamp);
         contentValues.put(COLUMN_TXT, row.get(COLUMN_TXT));
+        if(row.containsKey(COLUMN_STATUS))
+            contentValues.put(COLUMN_STATUS, Integer.valueOf(row.get(COLUMN_STATUS)));
         db.update(TABLE_NAME, contentValues, COLUMN_TIMESTAMP + " = ?", new String[]{timestamp});
         db.close();
     }
@@ -104,6 +117,11 @@ public class Repository extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void clean() {
+        SQLiteDatabase db = getReadableDatabase();
+        db.delete(TABLE_NAME, COLUMN_STATUS + " = -1", null);
+        db.close();
+    }
 
     public ArrayList<Map<String,String>> select(String limit, String offset) throws IOException {
         SQLiteDatabase db = getReadableDatabase();
@@ -132,21 +150,23 @@ public class Repository extends SQLiteOpenHelper {
 
         Map<String, String> row = new HashMap<>();
         String id = String.valueOf(cursor.getInt(0));
-        String timestamp = cursor.getString(1);
-        String txt = cursor.getString(2);
-        Log.i("repo.extract", id + ", " + timestamp + ", " + txt);
+        String status= String.valueOf(cursor.getInt(1));
+        String timestamp = cursor.getString(2);
+        String txt = cursor.getString(3);
+        Log.i("repo.extract", id + ", " + timestamp + ", " + txt + ", " + status);
         row.put(COLUMN_ID, id);
         row.put(COLUMN_TIMESTAMP, timestamp);
         row.put(COLUMN_TXT, txt);
+        row.put(COLUMN_STATUS, status);
         return row;
     }
 
     public ArrayList<Map<String,String>> select() throws IOException {
         SQLiteDatabase db = getReadableDatabase();
         //Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);
-        String limit = Property.get("limit", ctx);
+        String limit = opt.getString("limit", Property.get("limit", ctx));
         Log.i("select.limit", limit);
-        String sql = "SELECT * FROM "+TABLE_NAME+" ORDER BY RANDOM() LIMIT " + limit;
+        String sql = "SELECT * FROM "+TABLE_NAME + " where STATUS !=-1 " +" ORDER BY RANDOM() LIMIT " + limit;
         Log.i("repo.select", sql);
         Cursor cursor =db.rawQuery(sql, null);
         ArrayList<Map<String,String>> rows = fetch(cursor);

@@ -1,6 +1,7 @@
 package sample.note;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,25 +23,33 @@ import com.google.gson.JsonObject;
 import lombok.SneakyThrows;
 import okhttp3.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
-        implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+        implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener,
+        SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     SwipeRefreshLayout layout;
     ListView lv;
     Repository repo;
-    String TAG;
+    String TAG, host, limit;
     NotesAdapter adapter;
-    int position;
+    // select item position
+    int position = -1;
     //WebSocket ws;
     Button button;
+    SharedPreferences opt;
 
     @lombok.SneakyThrows
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        opt = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //host = Property.get("host", this);
+        //limit = Property.get("limit", this);
 
         // repository
         repo = new Repository(this);
@@ -68,7 +78,7 @@ public class MainActivity extends AppCompatActivity
         layout.setOnRefreshListener(this);
 
         //
-        findViewById(R.id.insert).setOnClickListener(this);
+        findViewById(R.id.help).setOnClickListener(this);
     }
 
     @Override
@@ -85,6 +95,10 @@ public class MainActivity extends AppCompatActivity
         int selected = item.getItemId();
 
         if (selected == R.id.view) {
+            if(position < 0){
+                Toast.makeText(this, "Please select an item.", Toast.LENGTH_LONG).show();
+                return true;
+            }
             Intent insert = new Intent(this, UpdateActivity.class);
             Map<String, String> data = adapter.getItem(position);
             String timestamp = data.get(Repository.COLUMN_TIMESTAMP);
@@ -98,10 +112,25 @@ public class MainActivity extends AppCompatActivity
             startActivity(insert);
             return true;
         }
+        if (selected == R.id.opt) {
+            Intent it = new Intent(this, PropertyActivity.class);
+            startActivity(it);
+            return true;
+        }
 
         if (selected == R.id.del) {
+            if(position < 0){
+                Toast.makeText(this, "Please select an item.", Toast.LENGTH_LONG).show();
+                return true;
+            }
             Map<String, String> data = adapter.getItem(position);
-            repo.delete(data);
+            data.put(Repository.COLUMN_STATUS, "-1");
+            //repo.delete(data);
+            repo.update(data);
+
+            ArrayList<Map<String, String>> list = repo.select();
+            adapter.notifyChanged(list);
+
             Toast.makeText(this, "deleted!", Toast.LENGTH_LONG).show();
             return true;
         }
@@ -109,9 +138,8 @@ public class MainActivity extends AppCompatActivity
         if (selected == R.id.synchronize) {
             SyncQuest syncQuest = new SyncQuest();
 
-            String host = Property.get("host", this);
-            String limit = Property.get("limit", this);
-
+            host = opt.getString("host", Property.get("host", this));
+            limit = opt.getString("limit", Property.get("limit", this));
             syncQuest.execute(host, limit);
             layout.setRefreshing(true);
 
@@ -154,8 +182,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-        Intent insert = new Intent(this, InsertActivity.class);
-        startActivity(insert);
+        position = -1;
+        openContextMenu(lv);
     }
 
     /*
@@ -188,6 +216,10 @@ public class MainActivity extends AppCompatActivity
 
         OkHttpClient client = new OkHttpClient();
         final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+        String limit, host;
+        final Request.Builder builder = new Request.Builder();
+        int step;
+        final Gson gson = new GsonBuilder().create();
 
         @SneakyThrows
         @Override
@@ -199,26 +231,18 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), s.toString(), Toast.LENGTH_LONG).show();
         }
 
-        @SneakyThrows
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            String host = objects[0].toString();
-            String limit = objects[1].toString();
+        void upload() throws Exception {
+
             String insertUrl = host + "insert.php";
             Log.i("TAG", "Insert URL: " + insertUrl);
-
-            Request.Builder builder = new Request.Builder();
             builder.url(insertUrl);
-
-            ArrayList<Map<String, String>> rows;
-            Gson gson = new GsonBuilder().create();
 
             // insert to Server
             int offset = 0;
-            int step = Integer.valueOf(limit);
+            step = Integer.valueOf(limit);
 
+            ArrayList<Map<String, String>> rows;
             rows = repo.select(limit, String.valueOf(offset));
-            try{
                 while (rows.size() > 0){
                     String feed = gson.toJson(rows);
                     Log.i("TAG", feed);
@@ -228,21 +252,20 @@ public class MainActivity extends AppCompatActivity
                     if(response.code()!=200){
                         String error = response.body().string();
                         Log.i("sync.post", error);
-                        return error;
+                        throw new Exception("sync.post: " + error);
                     }
 
                     offset += step;
                     rows = repo.select(limit, String.valueOf(offset));
                 }
-            }catch (Exception ex){
-                Log.e("sync.post.loop", ex.getMessage(), ex);
-                return ex.getMessage();
-            }
+        }
+
+        void restore() throws Exception {
 
             // restore from Server
             String selectUrl= host + "select.php";
 
-            offset = 0;
+            int offset = 0;
             int statusCode = 500;
 
             JsonObject feed = new JsonObject();
@@ -261,7 +284,7 @@ public class MainActivity extends AppCompatActivity
                 if(statusCode!=200){
                     String error = response.body().string();
                     Log.i("sync.obtain", error);
-                    return error;
+                    throw new Exception("sync.obtain: " + error);
                 }
 
                 String content = response.body().string();
@@ -272,6 +295,20 @@ public class MainActivity extends AppCompatActivity
 
                 offset += step;
             }while(statusCode ==200);
+        }
+        @SneakyThrows
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            host = objects[0].toString();
+            limit = objects[1].toString();
+
+            try{
+                upload();
+                restore();
+            }catch (Exception ex){
+                return ex.getMessage();
+            }
+            repo.clean();
 
             return "Synchronized!";
         }

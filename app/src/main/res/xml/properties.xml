@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:summary="Application Properties"
+            android:title="Settings" >
+
+        <ListPreference
+                android:defaultValue="32"
+                android:entries="@array/limitOptions"
+                android:entryValues="@array/limitValues"
+                android:key="limit"
+                android:summary="select limit"
+                android:title="limit" />
+        <ListPreference
+                android:defaultValue="http://10.0.2.2/phpnotes/"
+                android:entries="@array/hostOptions"
+                android:entryValues="@array/hostValues"
+                android:key="host"
+                android:summary="Web Server"
+                android:title="host" />
+    </PreferenceCategory>
+</androidx.preference.PreferenceScreen>

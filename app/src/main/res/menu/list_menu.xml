@@ -4,4 +4,6 @@
     <item android:id="@+id/del" android:title="Delete" />
     <item android:id="@+id/insert" android:title="Insert" />
     <item android:id="@+id/synchronize" android:title="Synchronize" />
+    <item android:id="@+id/save" android:title="Save" />
+    <item android:id="@+id/opt" android:title="Options" />
 </menu>

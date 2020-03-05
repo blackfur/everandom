@@ -12,4 +12,29 @@
         <item>Adobe Reader</item>
         <item>Adobe Illustrator</item>
     </string-array>
+
+    <string-array name="limitOptions">
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+        <item>32</item>
+    </string-array>
+
+    <string-array name="limitValues">
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+        <item>16</item>
+        <item>32</item>
+    </string-array>
+
+    <string-array name="hostOptions">
+        <item>10.0.2.2</item>
+        <item>127.0.0.1</item>
+    </string-array>
+    <string-array name="hostValues">
+        <item>http://10.0.2.2/phpnotes/</item>
+        <item>http://127.0.0.1/phpnotes/</item>
+    </string-array>
 </resources>
