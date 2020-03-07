@@ -24,6 +24,8 @@ import lombok.SneakyThrows;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity
             SyncQuest syncQuest = new SyncQuest();
 
             host = opt.getString("host", Property.get("host", this));
+            Toast.makeText(this, host, Toast.LENGTH_LONG).show();
             limit = opt.getString("limit", Property.get("limit", this));
             syncQuest.execute(host, limit);
             layout.setRefreshing(true);
@@ -214,12 +217,16 @@ public class MainActivity extends AppCompatActivity
 
     class SyncQuest extends AsyncTask {
 
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = Global.okHttpClient();
         final MediaType JSON = MediaType.get("application/json; charset=utf-8");
         String limit, host;
         final Request.Builder builder = new Request.Builder();
         int step;
         final Gson gson = new GsonBuilder().create();
+
+        SyncQuest() throws ClassNotFoundException, NoSuchFieldException, NoSuchAlgorithmException, IllegalAccessException, KeyManagementException {
+        }
 
         @SneakyThrows
         @Override

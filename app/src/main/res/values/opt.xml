@@ -32,9 +32,15 @@
     <string-array name="hostOptions">
         <item>10.0.2.2</item>
         <item>127.0.0.1</item>
+        <item>192.168.8.110</item>
+        <item>192.168.137.1</item>
+        <item>172.17.157.97</item>
     </string-array>
     <string-array name="hostValues">
-        <item>http://10.0.2.2/phpnotes/</item>
-        <item>http://127.0.0.1/phpnotes/</item>
+        <item>https://10.0.2.2/phpnotes/</item>
+        <item>https://127.0.0.1/phpnotes/</item>
+        <item>https://192.168.8.110/phpnotes/</item>
+        <item>https://192.168.137.1/phpnotes/</item>
+        <item>https://172.17.157.97/phpnotes/</item>
     </string-array>
 </resources>

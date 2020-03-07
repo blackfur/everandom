@@ -14,7 +14,7 @@
                 android:summary="select limit"
                 android:title="limit" />
         <ListPreference
-                android:defaultValue="http://10.0.2.2/phpnotes/"
+                android:defaultValue="https://10.0.2.2/phpnotes/"
                 android:entries="@array/hostOptions"
                 android:entryValues="@array/hostValues"
                 android:key="host"
