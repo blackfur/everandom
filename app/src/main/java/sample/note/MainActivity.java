@@ -10,7 +10,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,26 +22,23 @@ import com.google.gson.JsonObject;
 import lombok.SneakyThrows;
 import okhttp3.*;
 
-import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener,
         SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
-    SwipeRefreshLayout layout;
-    ListView lv;
-    Repository repo;
-    String TAG, host, limit;
-    NotesAdapter adapter;
+    private SwipeRefreshLayout layout;
+    private ListView lv;
+    private Repository repo;
+    private NotesAdapter adapter;
     // select item position
-    int position = -1;
-    //WebSocket ws;
-    Button button;
-    SharedPreferences opt;
+    private int position = -1;
+    private SharedPreferences opt;
 
     @lombok.SneakyThrows
     @Override
@@ -51,12 +47,12 @@ public class MainActivity extends AppCompatActivity
 
         opt = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //host = Property.get("host", this);
-        //limit = Property.get("limit", this);
+       //limit = Property.get("limit", this);
 
         // repository
         repo = new Repository(this);
 
-        TAG = Property.get("tag", getApplicationContext());
+        //String TAG = Property.get("tag", getApplicationContext());
 
         setContentView(R.layout.activity_main);
         // storing string resources into Array
@@ -103,6 +99,7 @@ public class MainActivity extends AppCompatActivity
             }
             Intent insert = new Intent(this, UpdateActivity.class);
             Map<String, String> data = adapter.getItem(position);
+            assert data != null;
             String timestamp = data.get(Repository.COLUMN_TIMESTAMP);
             insert.putExtra("timestamp", timestamp);
             startActivity(insert);
@@ -126,6 +123,7 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
             Map<String, String> data = adapter.getItem(position);
+            assert data != null;
             data.put(Repository.COLUMN_STATUS, "-1");
             //repo.delete(data);
             repo.update(data);
@@ -140,9 +138,9 @@ public class MainActivity extends AppCompatActivity
         if (selected == R.id.synchronize) {
             SyncQuest syncQuest = new SyncQuest();
 
-            host = opt.getString("host", Property.get("host", this));
+            String host = opt.getString("host", Property.get("host", this));
             Toast.makeText(this, host, Toast.LENGTH_LONG).show();
-            limit = opt.getString("limit", Property.get("limit", this));
+            String limit = opt.getString("limit", Property.get("limit", this));
             syncQuest.execute(host, limit);
             layout.setRefreshing(true);
 
@@ -246,7 +244,7 @@ public class MainActivity extends AppCompatActivity
 
             // insert to Server
             int offset = 0;
-            step = Integer.valueOf(limit);
+            step = Integer.parseInt(limit);
 
             ArrayList<Map<String, String>> rows;
             rows = repo.select(limit, String.valueOf(offset));
@@ -273,7 +271,7 @@ public class MainActivity extends AppCompatActivity
             String selectUrl= host + "select.php";
 
             int offset = 0;
-            int statusCode = 500;
+            int statusCode;
 
             JsonObject feed = new JsonObject();
             feed.addProperty("limit", limit);
@@ -294,14 +292,14 @@ public class MainActivity extends AppCompatActivity
                     throw new Exception("sync.obtain: " + error);
                 }
 
-                String content = response.body().string();
+                String content = (response.body()).string();
                 Log.i("sync.restore", content);
                 // store data
                 JsonArray array = gson.fromJson(content, JsonArray.class);
                 repo.restore(array);
 
                 offset += step;
-            }while(statusCode ==200);
+            }while(true);
         }
         @SneakyThrows
         @Override

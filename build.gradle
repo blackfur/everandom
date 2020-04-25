@@ -31,3 +31,21 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task cacheMvnLocal(type: Copy) {
+  from new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1')
+  into repositories.mavenLocal().url
+  eachFile {
+    println it.path
+    List<String> parts = it.path.split('/')
+    it.path = (parts[0]+ '/' + parts[1]).replace('.','/') + '/' + parts[2] + '/' + parts[4]
+  }
+  includeEmptyDirs false
+}
+
+task info{
+    logging.captureStandardOutput LogLevel.INFO
+    doFirst {
+        println 'A task message which is logged at INFO level'
+    }
+}
