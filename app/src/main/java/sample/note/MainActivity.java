@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
         opt = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //host = Property.get("host", this);
-       //limit = Property.get("limit", this);
+        //limit = Property.get("limit", this);
 
         // repository
         repo = new Repository(this);
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         int selected = item.getItemId();
 
         if (selected == R.id.view) {
-            if(position < 0){
+            if (position < 0) {
                 Toast.makeText(this, "Please select an item.", Toast.LENGTH_LONG).show();
                 return true;
             }
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (selected == R.id.del) {
-            if(position < 0){
+            if (position < 0) {
                 Toast.makeText(this, "Please select an item.", Toast.LENGTH_LONG).show();
                 return true;
             }
@@ -187,32 +187,6 @@ public class MainActivity extends AppCompatActivity
         openContextMenu(lv);
     }
 
-    /*
-    @SneakyThrows
-    void sync(){
-        int timeout = Integer.valueOf(Property.get("timeout", this));
-        String webSocketUri= Property.get("WebSocketUri", this);
-        WebSocketFactory factory = new WebSocketFactory().setConnectionTimeout(timeout);
-
-        // Create a WebSocket. The timeout value set above is used.
-        ws = factory.createSocket(webSocketUri);
-
-        ws.addListener(new SyncAdapter());
-        ws.connectAsynchronously();
-        if (ws.isOpen()) {
-            ws.sendText("Message from Android!");
-        }
-        ws.disconnect();
-        ws = null;
-    }
-    class SyncAdapter extends WebSocketAdapter{
-        @Override
-        public void onTextMessage(WebSocket websocket, String message) throws Exception {
-            Log.d("TAG", "onTextMessage: " + message);
-        }
-    }
-     */
-
     class SyncQuest extends AsyncTask {
 
         //OkHttpClient client = new OkHttpClient();
@@ -248,45 +222,45 @@ public class MainActivity extends AppCompatActivity
 
             ArrayList<Map<String, String>> rows;
             rows = repo.select(limit, String.valueOf(offset));
-                while (rows.size() > 0){
-                    String feed = gson.toJson(rows);
-                    Log.i("TAG", feed);
-                    RequestBody body = RequestBody.create(feed, JSON);
-                    Request request = new Request.Builder() .url(insertUrl) .post(body) .build();
-                    Response response = client.newCall(request).execute();
-                    if(response.code()!=200){
-                        String error = response.body().string();
-                        Log.i("sync.post", error);
-                        throw new Exception("sync.post: " + error);
-                    }
-
-                    offset += step;
-                    rows = repo.select(limit, String.valueOf(offset));
+            while (rows.size() > 0) {
+                String feed = gson.toJson(rows);
+                Log.i("UPLOAD", feed);
+                RequestBody body = RequestBody.create(feed, JSON);
+                Request request = new Request.Builder().url(insertUrl).post(body).build();
+                Response response = client.newCall(request).execute();
+                if (response.code() != 200) {
+                    String error = response.body().string();
+                    Log.i("sync.post", error);
+                    throw new Exception("sync.post: " + error);
                 }
+
+                offset += step;
+                rows = repo.select(limit, String.valueOf(offset));
+            }
         }
 
         void restore() throws Exception {
 
             // restore from Server
-            String selectUrl= host + "select.php";
+            String selectUrl = host + "select.php";
 
             int offset = 0;
             int statusCode;
 
             JsonObject feed = new JsonObject();
             feed.addProperty("limit", limit);
-            do{
+            do {
 
                 feed.addProperty("offset", offset);
                 String tmp = feed.toString();
                 Log.i("TAG", tmp);
                 RequestBody body = RequestBody.create(tmp, JSON);
-                Request request = new Request.Builder() .url(selectUrl) .post(body) .build();
+                Request request = new Request.Builder().url(selectUrl).post(body).build();
                 Response response = client.newCall(request).execute();
                 statusCode = response.code();
-                if(statusCode == 204)
+                if (statusCode == 204)
                     break;
-                if(statusCode!=200){
+                if (statusCode != 200) {
                     String error = response.body().string();
                     Log.i("sync.obtain", error);
                     throw new Exception("sync.obtain: " + error);
@@ -299,18 +273,20 @@ public class MainActivity extends AppCompatActivity
                 repo.restore(array);
 
                 offset += step;
-            }while(true);
+            } while (true);
         }
+
         @SneakyThrows
         @Override
         protected Object doInBackground(Object[] objects) {
             host = objects[0].toString();
             limit = objects[1].toString();
 
-            try{
+            try {
                 upload();
                 restore();
-            }catch (Exception ex){
+            } catch (Exception ex) {
+                Log.e("Sync", ex.getMessage());
                 return ex.getMessage();
             }
             repo.clean();

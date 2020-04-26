@@ -9,3 +9,6 @@ sqlite3 <db>
 adb shell netcfg
 ip addr show wlan0
 ip route
+
+service mysql start
+CREATE TABLE APP_NOTES(ID VARCHAR(16), TIMESTAMP VARCHAR(32), TXT VARCHAR(2048), STATUS VARCHAR(4));
