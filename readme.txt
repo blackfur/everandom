@@ -7,6 +7,7 @@ sqlite3 <db>
 .help
 
 adb shell netcfg
+ip addr
 ip addr show wlan0
 ip route
 

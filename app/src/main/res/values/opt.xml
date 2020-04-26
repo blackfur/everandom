@@ -1,18 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="adobe_products">
-        <item>Adobe After Effects</item>
-        <item>Adobe Bridge</item>
-        <item>Adobe Dreamweaver</item>
-        <item>Adobe Edge</item>
-        <item>Adobe Fireworks</item>
-        <item>Adobe Flash</item>
-        <item>Adobe Photoshop</item>
-        <item>Adobe Premiere</item>
-        <item>Adobe Reader</item>
-        <item>Adobe Illustrator</item>
-    </string-array>
-
     <string-array name="limitOptions">
         <item>2</item>
         <item>4</item>
@@ -35,6 +22,7 @@
         <item>192.168.8.110</item>
         <item>192.168.137.1</item>
         <item>172.17.157.97</item>
+        <item>192.168.128.101</item>
     </string-array>
     <string-array name="hostValues">
         <item>https://10.0.2.2/phpnotes/</item>

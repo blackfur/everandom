@@ -19,21 +19,4 @@ public class PropertyFragment extends PreferenceFragmentCompat
         setPreferencesFromResource(R.xml.properties, rootKey);
     }
 
-    /*
-    SharedPreferences opt;
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view,savedInstanceState);
-        opt = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        getPreferenceManager().findPreference("limit").setOnPreferenceChangeListener(this);
-    }
-
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Log.i("option.modify", newValue.toString());
-        Log.i("option.check", opt.getString("limit", "-1"));
-        Log.i("option.check", opt.getString("host", "-1"));
-        return true;
-    }
-     */
 }
