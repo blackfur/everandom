@@ -20,5 +20,9 @@
                 android:key="host"
                 android:summary="Web Server"
                 android:title="host" />
+        <EditTextPreference
+                android:title="@string/host"
+                android:summary="@string/host_summary"
+                android:key="host"/>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>
