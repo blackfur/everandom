@@ -21,4 +21,8 @@ public class Property {
     public static String get(String key,Context context) throws IOException {
         return obtain(context).getProperty(key);
     }
+    public static String get(String key) throws IOException {
+        return obtain(Global.appContext).getProperty(key);
+    }
+
 }

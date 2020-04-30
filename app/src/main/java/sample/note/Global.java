@@ -1,8 +1,12 @@
 package sample.note;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
+import androidx.preference.PreferenceManager;
+import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 
 import javax.net.ssl.*;
@@ -11,7 +15,37 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public class Global {
+public class Global extends Application {
+    public static Context appContext;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        appContext = getApplicationContext();
+
+        /* If you has other classes that need context object to initialize when application is created,
+         you can use the appContext here to process. */
+    }
+
+    @SneakyThrows
+    public static String host(){
+
+        SharedPreferences opt=
+        PreferenceManager.getDefaultSharedPreferences(appContext);
+        String host = opt.getString("prefix", Property.get("host"));
+        Log.i("get host", host);
+        return host;
+    }
+
+    @SneakyThrows
+    public static String prop(String key){
+
+        SharedPreferences opt=
+                PreferenceManager.getDefaultSharedPreferences(appContext);
+        String val= opt.getString(key, Property.get(key));
+        Log.i(key, val);
+        return val;
+    }
     public static void error(Context ctx, String hint, Exception e) {
         Log.e("Notes: ", hint, e);
         Toast.makeText(ctx, hint + e.getMessage(), Toast.LENGTH_LONG).show();

@@ -19,10 +19,12 @@
                 android:entryValues="@array/hostValues"
                 android:key="host"
                 android:summary="Web Server"
-                android:title="host" />
+                android:title="select host" />
         <EditTextPreference
+                android:dialogTitle="host"
+                android:defaultValue="https:///phpnotes/"
                 android:title="@string/host"
                 android:summary="@string/host_summary"
-                android:key="host"/>
+                android:key="prefix"/>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

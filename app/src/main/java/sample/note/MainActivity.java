@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
+import static sample.note.Global.prop;
+
 public class MainActivity extends AppCompatActivity
         implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener,
         SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
@@ -38,14 +40,12 @@ public class MainActivity extends AppCompatActivity
     private NotesAdapter adapter;
     // select item position
     private int position = -1;
-    private SharedPreferences opt;
 
     @lombok.SneakyThrows
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        opt = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         //host = Property.get("host", this);
         //limit = Property.get("limit", this);
 
@@ -138,9 +138,9 @@ public class MainActivity extends AppCompatActivity
         if (selected == R.id.synchronize) {
             SyncQuest syncQuest = new SyncQuest();
 
-            String host = opt.getString("host", Property.get("host", this));
+            String host = prop("prefix");
             Toast.makeText(this, host, Toast.LENGTH_LONG).show();
-            String limit = opt.getString("limit", Property.get("limit", this));
+            String limit = prop("limit");
             syncQuest.execute(host, limit);
             layout.setRefreshing(true);
 
