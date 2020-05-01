@@ -106,6 +106,11 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+        if (selected == R.id.upt) {
+            Intent activity= new Intent(this, VerUptActivity.class);
+            startActivity(activity);
+            return true;
+        }
         if (selected == R.id.insert) {
             Intent insert = new Intent(this, InsertActivity.class);
             startActivity(insert);

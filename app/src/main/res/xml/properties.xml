@@ -22,7 +22,7 @@
                 android:title="select host" />
         <EditTextPreference
                 android:dialogTitle="host"
-                android:defaultValue="https:///phpnotes/"
+                android:defaultValue="https://10.0.2.2/phpnotes/"
                 android:title="@string/host"
                 android:summary="@string/host_summary"
                 android:key="prefix"/>
