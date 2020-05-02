@@ -15,3 +15,6 @@ apachectl restart
 service mysql start
 
 CREATE TABLE APP_NOTES(ID VARCHAR(16), TIMESTAMP VARCHAR(32), TXT VARCHAR(2048), STATUS VARCHAR(4));
+
+* install
+  http://192.168.128.101/phpnotes/dist/release/

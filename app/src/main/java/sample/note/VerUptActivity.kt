@@ -1,6 +1,9 @@
 package sample.note
 
+import android.content.Intent
+import android.net.Uri
 import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,13 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import lombok.SneakyThrows
-import okhttp3.Call
 import okhttp3.Request
-import okhttp3.Response
-import sample.note.Global.okHttpClient
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.FileOutputStream
+import java.io.File
 import java.io.InputStream
 
 
@@ -72,35 +70,30 @@ class VerUptActivity : AppCompatActivity() {
                 return null
             }
 
-            // File output stream related object.
-            val fileOutputStream = FileOutputStream(LOCAL_APK_FILE)
-            val bufferedOutputStream = BufferedOutputStream(fileOutputStream)
-
-            // File input stream related object.
+            val localApk = LOCAL_APK_FILE()
             val inputStream: InputStream = response.body!!.byteStream()
-            val bufferedInputStream = BufferedInputStream(inputStream)
-
-            // Read data from input stream.
-            val dataBuf = ByteArray(1024)
-            var readLen: Int = bufferedInputStream.read(dataBuf)
-            var total = readLen
-
-            // If read data byte length bigger than -1.
-            while (readLen > -1) {
-                // Write buffer data to output stream.
-                bufferedOutputStream.write(dataBuf, 0, readLen)
-                // Read data again.
-                readLen = bufferedInputStream.read(dataBuf)
-                total += readLen
-                if(total%1048576 == 0) runOnUiThread { log!!.append("-> ${total/1048576} mb\n") }
+            val total:Int = download(File(localApk) , inputStream)
+            {
+                total -> if(total%1048576 == 0)
+                runOnUiThread { log!!.append("-> ${total/1048576} mb") }
             }
-            // Close input stream.
-            bufferedInputStream.close()
-            // Flush and close output stream.
-            bufferedOutputStream.flush()
-            bufferedOutputStream.close()
 
-            runOnUiThread { log!!.append("download success: ${total/1048576} mb, $LOCAL_APK_FILE\n") }
+            runOnUiThread { log!!.append("\ndownload success: ${total/1048576} mb, ${localApk}\n") }
+
+           // install apk
+            val apk= File(localApk)
+            if (!apk!!.exists()) {
+                runOnUiThread { log!!.append("apk not found\n") }
+                return null
+            }
+            val i = Intent(Intent.ACTION_VIEW)
+            i.setDataAndType(apk.uri(), "application/vnd.android.package-archive")
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            runOnUiThread { startActivity(i) }
+
             return null
         }
     }
