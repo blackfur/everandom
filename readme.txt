@@ -18,3 +18,9 @@ CREATE TABLE APP_NOTES(ID VARCHAR(16), TIMESTAMP VARCHAR(32), TXT VARCHAR(2048),
 
 * install
   http://192.168.128.101/phpnotes/dist/release/
+
+emulator.sh -avd iwill
+adb uninstall sample.note
+./gradlew installRelease
+adb shell am start -n sample.note/.MainActivity
+./gradlew assemble
