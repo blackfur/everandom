@@ -1,16 +1,15 @@
-package com.example.aymen.androidchat;
+package sample.note;
 
-
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -37,13 +36,13 @@ public class ChatBoxActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_box);
 
-        messagetxt = (EditText) findViewById(R.id.message) ;
-        send = (Button)findViewById(R.id.send);
+        messagetxt = findViewById(R.id.message);
+        send = findViewById(R.id.send);
         // get the nickame of the user
-        Nickname= (String)getIntent().getExtras().getString(MainActivity.NICKNAME);
+        Nickname= (String)getIntent().getExtras().getString(define.NICKNAME);
         //connect you socket client to the server
         try {
-            socket = IO.socket("http://10.0.2.2:3000");
+            socket = IO.socket(define.CHAT_SERVER);
             socket.connect();
             socket.emit("join", Nickname);
         } catch (URISyntaxException e) {

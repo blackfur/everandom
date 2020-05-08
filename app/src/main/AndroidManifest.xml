@@ -46,6 +46,9 @@
     <activity android:name=".UpdateActivity"/>
     <activity android:name=".PropertyActivity"/>
   <activity android:name=".QrCodeActivity"/>
+
+        <activity android:name=".ChatRegisterActivity"> </activity>
+        <activity android:name=".ChatBoxActivity"></activity>
   </application>
 
 </manifest>

@@ -82,7 +82,7 @@ class VerUptActivity : AppCompatActivity() {
 
            // install apk
             val apk= File(localApk)
-            if (!apk!!.exists()) {
+            if (!apk.exists()) {
                 runOnUiThread { log!!.append("apk not found\n") }
                 return null
             }

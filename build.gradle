@@ -6,7 +6,7 @@ buildscript {
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
 	maven{ url'http://maven.aliyun.com/nexus/content/groups/public/' }
 	maven{ url'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
-        mavenCentral()
+        //mavenCentral()
         jcenter()
         google()
 
@@ -26,7 +26,7 @@ allprojects {
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/central/' }
 	maven{ url'http://maven.aliyun.com/nexus/content/groups/public/' }
 	maven{ url'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
-        mavenCentral()
+        //mavenCentral()
         jcenter()
         google()
 
