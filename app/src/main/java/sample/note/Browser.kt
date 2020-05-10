@@ -1,5 +1,6 @@
 package sample.note
 
+import android.os.Build
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -17,6 +18,10 @@ class Browser : AppCompatActivity(){
         webView!!.webViewClient = Delegate()
         webView!!.settings.loadsImagesAutomatically = true
         webView!!.settings.javaScriptEnabled=true
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) WebView.setWebContentsDebuggingEnabled(true)
+
+        url = intent.getStringExtra("index") ?: errorHtml
+        webView!!.clearCache(true)
         webView!!.loadUrl(url!!)
     }
 

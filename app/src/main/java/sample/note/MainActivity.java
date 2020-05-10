@@ -112,7 +112,9 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         if (selected == R.id.chat) {
-            Intent activity= new Intent(this, ChatRegisterActivity.class);
+            //Intent activity= new Intent(this, ChatRegisterActivity.class);
+            Intent activity= new Intent(this, Browser.class);
+            activity.putExtra("index", prop("chat"));
             startActivity(activity);
             return true;
         }

@@ -26,5 +26,12 @@
                 android:title="@string/host"
                 android:summary="@string/host_summary"
                 android:key="prefix"/>
+
+        <EditTextPreference
+                android:dialogTitle="chat"
+                android:defaultValue="http://10.0.2.2:3000/"
+                android:title="@string/chat"
+                android:summary="@string/chat_summary"
+                android:key="chat"/>
     </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

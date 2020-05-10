@@ -23,4 +23,6 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="download_install">download and install</string>
     <string name="go">go</string>
+    <string name="chat">chat</string>
+    <string name="chat_summary">chat server url</string>
 </resources>
